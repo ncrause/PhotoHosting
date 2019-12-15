@@ -1,0 +1,46 @@
+/*
+Copyright (C) 2019 Nathan Crause <nathan@crause.name>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/* 
+    Created on : 12-Dec-2019, 9:00:31 AM
+    Author     : Nathan Crause <nathan@crause.name>
+*/
+
+a[target="_blank"]::after, a[data-app-trigger="dialog"]::after {
+	font-size: 0.5em;
+	vertical-align: super;
+	font-family: "Font Awesome 5 Free";
+	display: inline-block;  /* we need this in order to make text-decoration: none actually do something */
+
+}
+
+a[target="_blank"]:hover::after, a[data-app-trigger="dialog"]:hover::after {
+	text-decoration: none;
+}
+
+a[target="_blank"]::after {
+	font-weight: 900;
+	content: " \f35d";
+}
+
+a[data-app-trigger="dialog"]::after {
+	font-weight: 400;
+	content: " \f2d2";
+}
+
+#powered-by a[target="_blank"]::after {
+	content: "";
+}
