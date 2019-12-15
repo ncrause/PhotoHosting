@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
+
+	<bean id="databaseAccessService" class="photohosting.services.DatabaseAccessServiceImpl" />
+	<bean id="userService" class="photohosting.services.UserServiceImpl">
+		<property name="databaseAccessService" ref="databaseAccessService" />
+	</bean>
+	<bean id="photoService" class="photohosting.services.PhotoServiceImpl">
+		<property name="databaseAccessService" ref="databaseAccessService" />
+	</bean>
+	<bean id="imageService" class="photohosting.services.ImageService" />
+	<bean id="nonceService" class="photohosting.services.NonceService" />
+	
+</beans>
