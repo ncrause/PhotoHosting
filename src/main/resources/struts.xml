@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+        "http://struts.apache.org/dtds/struts-2.5.dtd">
+
+<struts>
+
+    <constant name="struts.enable.DynamicMethodInvocation" value="false"/>
+    <constant name="struts.enable.SlashesInActionNames" value="true"/>
+    <constant name="struts.mapper.alwaysSelectFullNamespace" value="false"/>
+	<constant name="struts.patternMatcher" value="regex" />
+
+    <package name="photohosting" extends="struts-default">
+		
+		<interceptors>
+			<interceptor name="slideshow" class="photohosting.SlideshowInterceptor"/>
+		</interceptors>
+
+        <default-action-ref name="index" />
+
+        <action name="index" class="photohosting.IndexAction">
+			<interceptor-ref name="slideshow"/>
+			<interceptor-ref name="defaultStack"/>
+            <result>/WEB-INF/jsp/index.jsp</result>
+        </action>
+
+        <action name="helloWorld" class="photohosting.HelloWorldAction">
+            <result name="input">/WEB-INF/jsp/index.jsp</result>
+            <result>/WEB-INF/jsp/helloWorld.jsp</result>
+        </action>
+		
+		<!-- see https://struts.apache.org/core-developers/wildcard-mappings.html -->
+		<action name="show/{id}/{nonce}" class="photohosting.ShowAction">
+			<result type="stream">
+				<param name="contentType">image/jpeg</param>
+				<param name="inputName">stream</param>
+				<param name="contentDisposition">inline;filename="${filename}"</param>
+				<param name="bufferSize">1024</param>
+			</result>
+			
+			<!-- <result name="redirect" type="redirect">
+				<param name="location">/show/%{id}.action</param>
+				<param name="id"></param>
+				<param name="nonce"></param>
+			</result> -->
+			<result name="html">/WEB-INF/jsp/show.jsp</result>
+		</action>
+		
+		<action name="show/{id}" class="photohosting.ShowAction">
+			<param name="nonce"></param>
+			<result>/WEB-INF/jsp/show.jsp</result>
+		</action>
+		
+		<action name="preview/{type}/{id}" class="photohosting.PreviewAction">
+			<result type="stream">
+				<param name="contentType">image/jpeg</param>
+				<param name="inputName">stream</param>
+				<param name="contentDisposition">inline;filename="${filename}"</param>
+				<param name="bufferSize">1024</param>
+			</result>
+		</action>
+		
+		<action name="login" class="photohosting.LoginAction">
+			<interceptor-ref name="slideshow"/>
+			<interceptor-ref name="defaultStack"/>
+			<result name="input">/WEB-INF/jsp/index.jsp</result>
+			<result type="redirect">
+				<param name="location">https://www.google.ca</param>
+			</result>
+		</action>
+		
+		<action name="about-us" class="com.opensymphony.xwork2.ActionSupport">
+			<result>/WEB-INF/jsp/about-us.jsp</result>
+		</action>
+		
+		<action name="signup" class="photohosting.SignupAction">
+			<interceptor-ref name="slideshow"/>
+			<interceptor-ref name="defaultStack"/>
+			<result>/WEB-INF/jsp/index.jsp</result>
+			<result name="input">/WEB-INF/jsp/index.jsp</result>
+		</action>
+
+    </package>
+
+</struts>
