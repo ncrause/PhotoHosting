@@ -9,6 +9,8 @@
 	</bean>
 	<bean id="photoService" class="photohosting.services.PhotoServiceImpl">
 		<property name="databaseAccessService" ref="databaseAccessService" />
+		<property name="imageService" ref="imageService" />
+		<property name="userService" ref="userService" />
 	</bean>
 	<bean id="imageService" class="photohosting.services.ImageService" />
 	<bean id="nonceService" class="photohosting.services.NonceService" />

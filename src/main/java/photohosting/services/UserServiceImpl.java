@@ -17,6 +17,7 @@
 package photohosting.services;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Random;
 import lombok.Setter;
 import org.apache.hadoop.hbase.TableName;
@@ -67,6 +68,18 @@ public class UserServiceImpl implements UserService {
 				put.addColumn(Bytes.toBytes(CF_IDENTIFICATION), 
 						Bytes.toBytes(Q_PASSWORD), 
 						user.getPasswordHash());
+
+				List<String> photoIDs = user.getPhotoIDs();
+
+				for (int index = 0; index < user.photoCount(); ++index) {
+					put.addColumn(Bytes.toBytes(UserService.CF_PHOTOS),
+							Bytes.toBytes(String.format("%s%d", UserService.Q_PREFIX_KEY, index + 1)),
+							Bytes.toBytes(photoIDs.get(index)));
+				}
+				
+				put.addColumn(Bytes.toBytes(UserService.CF_PHOTOS), 
+						Bytes.toBytes(UserService.Q_COUNT), 
+						Bytes.toBytes(user.photoCount()));
 				
 				table.put(put);
 			}

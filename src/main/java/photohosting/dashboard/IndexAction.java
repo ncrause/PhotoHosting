@@ -19,8 +19,11 @@ package photohosting.dashboard;
 import com.opensymphony.xwork2.ActionSupport;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.Setter;
+import photohosting.FlashAware;
 import photohosting.services.PhotoService;
 import photohosting.services.beans.Photo;
 import photohosting.services.beans.User;
@@ -32,13 +35,19 @@ import photohosting.services.beans.User;
  *
  * @author Nathan Crause <nathan@crause.name>
  */
-public class IndexAction extends ActionSupport implements AuthenticationAware {
+public class IndexAction extends ActionSupport implements AuthenticationAware, FlashAware {
 	
 	@Setter
 	private PhotoService photoService;
 	
 	@Getter @Setter
 	private User authenticatedUser;
+	
+	@Getter @Setter
+	private Map<String, Object> session;
+	
+	@Getter @Setter
+	private HttpServletRequest servletRequest;
 	
 	@Getter @Setter
 	private List<Photo> userPhotos;

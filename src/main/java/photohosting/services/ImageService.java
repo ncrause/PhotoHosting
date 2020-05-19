@@ -18,15 +18,20 @@ package photohosting.services;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Iterator;
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 import photohosting.services.beans.Images;
 
@@ -55,13 +60,30 @@ public class ImageService {
 	 * @throws IOException 
 	 */
 	public Images prepare(URL source) throws IOException {
+//		Images images = new Images();
+//		BufferedImage image = ImageIO.read(source);
+//		Dimension size = new Dimension(image.getWidth(), image.getHeight());
+//		
+//		images.setHighResolution(toJPG(scale(image), 82));
+//		images.setOpengraphImage(toJPG(scale(image, calculateOG(size)), 20));
+//		images.setRedditImage(toJPG(scale(image, calculateReddit(size)), 40));
+//		images.setTwitterImage(toJPG(scale(image, calculateTwitter(size)), 20));
+//		
+//		return images;
+		return prepare(ImageIO.read(source));
+	}
+	
+	public Images prepare(File source) throws IOException {
+		return prepare(ImageIO.read(source));
+	}
+	
+	private Images prepare(BufferedImage image) throws IOException {
 		Images images = new Images();
-		BufferedImage image = ImageIO.read(source);
 		Dimension size = new Dimension(image.getWidth(), image.getHeight());
 		
 		images.setHighResolution(toJPG(scale(image), 82));
 		images.setOpengraphImage(toJPG(scale(image, calculateOG(size)), 20));
-		images.setRedditImage(toJPG(scale(image, calculateReddit(size)), 40));
+		images.setRedditImage(toJPG(scale(image, calculateReddit(size)), 30));
 		images.setTwitterImage(toJPG(scale(image, calculateTwitter(size)), 20));
 		
 		return images;
@@ -124,6 +146,8 @@ public class ImageService {
 		int y = (int) ((scaled.getHeight() - target.getHeight()) / 2d);
 		
 		// when returning the result, perform the crop!
+		System.out.println("Point: " + new Point(x, y));
+		System.out.println("Size: " + target);
 		return result.getSubimage(x, y, target.width, target.height);
 	}
 	
@@ -193,13 +217,72 @@ public class ImageService {
 	}
 
 	Dimension calculateScaled(Dimension size, Dimension target) {
-		double sourceRatio = size.getWidth() / size.getHeight();
+		double xRatio = size.getWidth() / target.getWidth();
+		double yRatio = size.getHeight() / target.getHeight();
 		
-		if (sourceRatio < 1.0d) {
-			return new Dimension(target.width, Math.max((int) (target.getWidth() / sourceRatio), target.height));
+		if (xRatio > yRatio) {
+			return new Dimension((int) (size.getWidth() / yRatio), target.height);
 		}
-		
-		return new Dimension(Math.max((int) (target.getHeight() * sourceRatio), target.width), target.height);
+		else {
+			return new Dimension(target.width, (int) (size.getHeight() / xRatio));
+		}
+	}
+	
+	/**
+	 * Given a URL, this method extracts only the dimensions of the image,
+	 * without reading in the entire file.Nice and quick.
+	 * 
+	 * @param url
+	 * @return 
+	 * @throws java.io.IOException 
+	 * @see https://www.codota.com/code/java/methods/javax.imageio.ImageReader/getWidth
+	 */
+	public Dimension getImageDimensions(URL url) throws IOException {
+		try (ImageInputStream inputStream = ImageIO.createImageInputStream(url)) {
+//			Iterator<ImageReader> readers = ImageIO.getImageReaders(inputStream);
+//			
+//			if (!readers.hasNext()) {
+//				throw new IOException("Unsupported/unreadable image.");
+//			}
+//			
+//			ImageReader reader = readers.next();
+//			
+//			try {
+//				reader.setInput(inputStream);
+//				
+//				return new Dimension(reader.getWidth(0), reader.getHeight(0));
+//			}
+//			finally {
+//				reader.dispose();
+//			}
+			return getImageDimensions(inputStream);
+		}
+	}
+	
+	public Dimension getImageDimensions(File file) throws IOException {
+		try (ImageInputStream inputStream = ImageIO.createImageInputStream(file)) {
+			return getImageDimensions(inputStream);
+		}
+	}
+	
+	private Dimension getImageDimensions(ImageInputStream inputStream) 
+			throws IOException {
+		Iterator<ImageReader> readers = ImageIO.getImageReaders(inputStream);
+
+		if (!readers.hasNext()) {
+			throw new IOException("Unsupported/unreadable image.");
+		}
+
+		ImageReader reader = readers.next();
+
+		try {
+			reader.setInput(inputStream);
+
+			return new Dimension(reader.getWidth(0), reader.getHeight(0));
+		}
+		finally {
+			reader.dispose();
+		}
 	}
 	
 }

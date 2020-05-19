@@ -30,6 +30,8 @@ public interface FlashAware extends SessionAware, ServletRequestAware {
 	
 	public static final String FLASH_CONTEXT = "flash context".intern();
 	
+	public static final String SUCCESS_FLASH = "success".intern();
+	
 	/**
 	 * Symbiotic with SessionAware
 	 * @return 
@@ -68,6 +70,31 @@ public interface FlashAware extends SessionAware, ServletRequestAware {
 		}
 		
 		((Map<String, String>) getSession().get(FLASH_CONTEXT)).put(name, value);
+	}
+	
+	default boolean hasFlash(String name) {
+		// if neither the session nor the request has the flash context,
+		// we know there's no possible chance of finding the name
+		if (!getSession().containsKey(FLASH_CONTEXT) && getServletRequest().getAttribute(FLASH_CONTEXT) == null) {
+			return false;
+		}
+		if (getSession().containsKey(FLASH_CONTEXT)) {
+			Map<String, String> map = (Map<String, String>) getSession().get(FLASH_CONTEXT);
+			
+			if (map.containsKey(name)) {
+				return true;
+			}
+		}
+		
+		Map<String, String> map = (Map<String, String>) getServletRequest().getAttribute(FLASH_CONTEXT);
+		
+		if (map != null) {
+			if (map.containsKey(name)) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 }

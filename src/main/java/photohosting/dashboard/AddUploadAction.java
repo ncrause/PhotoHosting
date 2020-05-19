@@ -17,14 +17,25 @@
 package photohosting.dashboard;
 
 import com.opensymphony.xwork2.ActionSupport;
+import java.awt.Dimension;
+import java.io.File;
+import java.net.URL;
+import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.Setter;
 import photohosting.FlashAware;
+import photohosting.services.ImageService;
+import photohosting.services.PhotoService;
+import photohosting.services.beans.Photo;
 import photohosting.services.beans.User;
+import photohosting.utils.Values;
 
 /**
+ * We might have been able to use validation annotations, but some of them are
+ * just too specific, so I'm going to stick with coding validations myself.
  *
  * @author Nathan Crause <nathan@crause.name>
  */
@@ -39,6 +50,88 @@ public class AddUploadAction extends ActionSupport implements AuthenticationAwar
 	@Getter @Setter
 	private HttpServletRequest servletRequest;
 	
+	@Getter @Setter
+	private ImageService imageService;
 	
+	@Getter @Setter
+	private PhotoService photoService;
+	
+	@Getter @Setter
+	private File photoSource;
+	
+	@Getter @Setter
+	private String photoSourceContentType;
+	
+	@Getter @Setter
+	private String photoSourceFileName;
+	
+	@Getter @Setter
+	private String authorName;
+	
+	@Getter @Setter
+	private String authorURL;
+	
+	@Getter @Setter
+	private String sourceName;
+	
+	@Getter @Setter
+	private String sourceURL;
+	
+	@Override
+    public String execute() throws Exception {
+		if (getPhotoSource() == null) {
+			addActionError(getText("dashboard.upload.nofile.failure.message"));
+			
+			return INPUT;
+		}
+		// I've decided to use probeContentType instead of relying on
+		// photoSourceContentType, because I don't know if clients can inject
+		// a mime type, and thus injecting garbage content. However, MacOS
+		// doesn't seem capable of identifying shit, so I do still need to
+		// keep photoSourceContentType as a failover type :(
+		String detectedContentType = Values.coalesce(
+				Files.probeContentType(getPhotoSource().toPath()),
+				photoSourceContentType);
+		
+		if (!Arrays.asList("image/jpeg", "image/png").contains(detectedContentType)) {
+			addActionError(getText("dashboard.upload.type.failure.message", Arrays.asList(detectedContentType)));
+			
+			return INPUT;
+		}
+		
+		Dimension photoSourceSize = imageService.getImageDimensions(getPhotoSource());
+		
+		if (photoSourceSize.width < 960 || photoSourceSize.height < 600) {
+			addActionError(getText("dashboard.upload.size.failure.message"));
+			
+			return INPUT;
+		}
+		
+		String id = photoService.create(authenticatedUser, photoSource, photoSourceFileName);
+		// now that we have the photo record added, let's set the metadata
+		Photo photo = photoService.get(id);
+		
+		if (authorName != null) {
+			photo.setAuthorName(authorName);
+			
+			if (authorURL != null) {
+				photo.setAuthorURL(authorURL);
+			}
+		}
+		
+		if (sourceName != null) {
+			photo.setSourceName(sourceName);
+			
+			if (sourceURL != null) {
+				photo.setSourceURL(sourceURL);
+			}
+		}
+		
+		photoService.save(photo);
+		
+		setFlash(SUCCESS_FLASH, "Successfully uploaded new photo.");
+		
+        return SUCCESS;
+    }
 	
 }

@@ -92,13 +92,14 @@
 
     </package>
 	
-	<package name="dashboard" extends="struts-default" namespace="/dashboard">
+	<package name="dashboard" extends="flash-capable" namespace="/dashboard">
 		
 		<interceptors>
 			<interceptor name="authenticated" class="photohosting.dashboard.AuthenticatedInterceptor"/>
 		
 			<interceptor-stack name="authenticatedStack">
 				<interceptor-ref name="authenticated"/>
+				<interceptor-ref name="flash"/>
 				<interceptor-ref name="defaultStack"/>
 			</interceptor-stack>
 		</interceptors>

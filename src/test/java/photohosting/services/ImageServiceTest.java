@@ -190,4 +190,17 @@ public class ImageServiceTest {
 		assertEquals(400, result.height);
 	}
 	
+	@Test
+	public void testCalculateScaled_wideSource_widerTarget() {
+		System.out.println("calculateScaled with a wide source and a wide target");
+		
+		Dimension size = new Dimension(2000, 1000);
+		Dimension target = new Dimension(300, 100);
+		Dimension result = subject.calculateScaled(size, target);
+		
+		System.out.println(result);
+		
+		assertEquals(150, result.height);
+	}
+	
 }

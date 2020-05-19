@@ -23,19 +23,29 @@
 						<meta itemProp="encodingFormat" content="image/jpeg">
 						
 						<figcaption>
-							<s:if test="%{photo.authorURL != null && photo.authorName != null}">
+							<s:if test="%{photo.authorName != null && photo.authorName != ''}">
 								<div itemprop="author" itemscope itemtype="http://schema.org/Person">
-									Author: <a href="<s:property value="photo.authorURL"/>" target="_blank" itemprop="url">
+									Author: 
+									<s:if test="%{photo.authorURL != null && photo.authorURL != ''}">
+									<a href="<s:property value="photo.authorURL"/>" target="_blank" itemprop="url">
+									</s:if>
 										<span itemprop="name"><s:property value="photo.authorName"/></span>
+									<s:if test="%{photo.authorURL != null && photo.authorURL != ''}">
 									</a>
+									</s:if>
 								</div>
 							</s:if>
 							
-							<s:if test="%{photo.sourceURL != null && photo.sourceName != null}">
+							<s:if test="%{photo.sourceName != null && photo.sourceName != ''}">
 								<div itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
-									Publisher: <a href="<s:property value="photo.sourceURL"/>" target="_blank" itemprop="url">
+									Publisher:
+									<s:if test="%{photo.sourceURL != null && photo.sourceURL != ''}">
+									<a href="<s:property value="photo.sourceURL"/>" target="_blank" itemprop="url">
+									</s:if>
 										<span itemprop="name"><s:property value="photo.sourceName"/></span>
+									<s:if test="%{photo.sourceURL != null && photo.sourceURL != ''}">
 									</a>
+									</s:if>
 								</div>
 							</s:if>
 						</figcaption>

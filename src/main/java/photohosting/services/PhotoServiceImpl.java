@@ -16,16 +16,20 @@
  */
 package photohosting.services;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import lombok.Setter;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Get;
+import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
+import photohosting.services.beans.Images;
 import photohosting.services.beans.Photo;
 import photohosting.services.beans.User;
 
@@ -37,6 +41,12 @@ public class PhotoServiceImpl implements PhotoService {
 	
 	@Setter
 	private DatabaseAccessService databaseAccessService;
+	
+	@Setter
+	private ImageService imageService;
+	
+	@Setter
+	private UserService userService;
 	
 	private static TableName getTableName() {
 		return TableName.valueOf(DatabaseAccessService.NAMESPACE, TABLE_NAME);
@@ -114,6 +124,75 @@ public class PhotoServiceImpl implements PhotoService {
 				
 				return result.getValue(Bytes.toBytes(PhotoService.CF_CONTENT), 
 						Bytes.toBytes(qualifier));
+			}
+		}
+	}
+
+	@Override
+	public String create(User user, File file, String originalFilename) throws IOException {
+		// just strip off known image extensions
+		String useFilename = originalFilename.replaceAll("(?:\\.jpg)|(?:\\.png)", "");
+		String id = useFilename + "-" + UUID.randomUUID().toString();
+		
+		
+		try (Connection connection = databaseAccessService.openConnection()) {
+			try (Table table = connection.getTable(getTableName())) {
+				Put photo = new Put(Bytes.toBytes(id));
+				Images images = imageService.prepare(file);
+
+				photo.addColumn(Bytes.toBytes(PhotoService.CF_OWNERSHIP), 
+						Bytes.toBytes(PhotoService.Q_EMAIL), 
+						Bytes.toBytes(user.getEmailAddress()));
+				photo.addColumn(Bytes.toBytes(PhotoService.CF_CONTENT),
+						Bytes.toBytes(PhotoService.Q_MIME_TYPE),
+						Bytes.toBytes("image/jpeg"));
+				photo.addColumn(Bytes.toBytes(PhotoService.CF_CONTENT),
+						Bytes.toBytes(PhotoService.Q_HIGH_RES),
+						images.getHighResolution());
+				photo.addColumn(Bytes.toBytes(PhotoService.CF_CONTENT),
+						Bytes.toBytes(PhotoService.Q_OG_IMAGE),
+						images.getOpengraphImage());
+				photo.addColumn(Bytes.toBytes(PhotoService.CF_CONTENT),
+						Bytes.toBytes(PhotoService.Q_REDDIT_IMAGE),
+						images.getRedditImage());
+				photo.addColumn(Bytes.toBytes(PhotoService.CF_CONTENT),
+						Bytes.toBytes(PhotoService.Q_TWITTER_IMAGE),
+						images.getTwitterImage());
+				
+				table.put(photo);
+				
+				user.addPhotoID(id);
+				
+				userService.save(user);
+		
+				return id;
+			}
+		}
+	}
+
+	@Override
+	public void save(Photo photo) throws IOException {
+		try (Connection connection = databaseAccessService.openConnection()) {
+			try (Table target = connection.getTable(getTableName())) {
+				Put put = new Put(Bytes.toBytes(photo.getId()));
+				
+				put.addColumn(Bytes.toBytes(CF_CREDIT), 
+						Bytes.toBytes(Q_EMAIL), 
+						Bytes.toBytes(photo.getOwner()));
+				put.addColumn(Bytes.toBytes(CF_CREDIT), 
+						Bytes.toBytes(Q_AUTHOR_NAME), 
+						Bytes.toBytes(photo.getAuthorName()));
+				put.addColumn(Bytes.toBytes(CF_CREDIT), 
+						Bytes.toBytes(Q_AUTHOR_URL), 
+						Bytes.toBytes(photo.getAuthorURL()));
+				put.addColumn(Bytes.toBytes(CF_CREDIT), 
+						Bytes.toBytes(Q_SOURCE_NAME), 
+						Bytes.toBytes(photo.getSourceName()));
+				put.addColumn(Bytes.toBytes(CF_CREDIT), 
+						Bytes.toBytes(Q_SOURCE_URL), 
+						Bytes.toBytes(photo.getSourceURL()));
+				
+				target.put(put);
 			}
 		}
 	}

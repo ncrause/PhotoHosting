@@ -16,6 +16,7 @@
  */
 package photohosting.services;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import photohosting.services.beans.Photo;
@@ -94,5 +95,31 @@ public interface PhotoService {
 	public byte[] retrieveRedditImage(String id) throws IOException;
 	
 	public byte[] retrieveTwitterImage(String id) throws IOException;
+	
+	/**
+	 * Performs an entire creation of a photo, from reading it, scaling it,
+	 * associating it with the user, etc.
+	 * 
+	 * @param user the user to which the photo is to be associated
+	 * @param file the local file (typically temp file uploaded)
+	 * @param originalFilename in order to give the final "filename" some
+	 * association to the original, we need to know the file's name as it
+	 * existed on the user's workstation
+	 * @return the new photo record's ID
+	 * @throws IOException 
+	 */
+	public String create(User user, File file, String originalFilename) throws IOException;
+	
+	/**
+	 * Write any data in the bean, regardless of a change has occurred or not
+	 * (there is no implicit "dirty" checking - it serves no purpose).
+	 * 
+	 * Due to the nature of how HBase functions, we don't need to care if this
+	 * is a new record, or an update - so long as we have an ID, we're good.
+	 * 
+	 * @param photo
+	 * @throws IOException 
+	 */
+	public void save(Photo photo) throws IOException;
 	
 }
