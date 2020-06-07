@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Nathan Crause <nathan@crause.name>
+ * Copyright (C) 2020 Nathan Crause <nathan@crause.name>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,34 +16,33 @@
  */
 package photohosting;
 
-import java.io.IOException;
+import javax.naming.NamingException;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import photohosting.services.DatabaseAccessServiceImpl;
-import photohosting.utils.DatabaseBootstrap;
 
 /**
- * Web application lifecycle listener.
+ * Web application lifecycle listener which sets up and tears down the
+ * singleton <code>Configuration</code> instance.
  *
  * @author Nathan Crause <nathan@crause.name>
  */
-public class DatabaseBootstrapListener implements ServletContextListener {
+public class ConfigurationListener implements ServletContextListener {
 
 	@Override
-	public void contextInitialized(ServletContextEvent sce) {
+	public void contextInitialized(ServletContextEvent contextEvent) {
+		contextEvent.getServletContext().log("ConfigurationListener.contextInitialized");
+		
 		try {
-			DatabaseBootstrap bootstrapper = new DatabaseBootstrap(
-					sce.getServletContext(), new DatabaseAccessServiceImpl());
-			
-			bootstrapper.bootstrap();
+			Configuration.initialize();
 		}
-		catch (IOException ex) {
-			throw new RuntimeException("Critical failure encountered during database bootstrap", ex);
+		catch (NamingException ex) {
+			throw new RuntimeException("Failure during configuration initialization", ex);
 		}
 	}
 
 	@Override
-	public void contextDestroyed(ServletContextEvent sce) {
-		// we don't much care
+	public void contextDestroyed(ServletContextEvent contextEvent) {
+		Configuration.get().shutdown();
 	}
+	
 }
