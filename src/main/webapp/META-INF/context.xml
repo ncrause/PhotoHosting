@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context antiJARLocking="true" path="">
 	<ResourceLink name="mail/PhotoHosting" global="mail/PhotoHosting" type="javax.mail.Session"/>
+	<ResourceLink name="configuration/PhotoHosting/Environment" global="configuration/DeploymentEnvironment" type="java.lang.String"/>
 </Context>
