@@ -98,6 +98,8 @@ public class UserServiceImpl implements UserService {
 		user.setEmailAddress(emailAddress);
 		user.setPassword(password);
 		
+		save(user);
+		
 		return password;
 	}
 	

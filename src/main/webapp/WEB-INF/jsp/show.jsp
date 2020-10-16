@@ -8,6 +8,8 @@
 		<s:head />
 		<meta property="og:image" content="<s:url action="preview/og/%{id}" forceAddSchemeHostAndPort="true"/>">
 		<link rel="image_src" href="<s:url action="preview/reddit/%{id}" forceAddSchemeHostAndPort="true"/>">
+		<meta name="twitter:card" content="summary_large_image">
+		<meta name="twitter:title" content="<s:url action="preview/twitter/%{id}" forceAddSchemeHostAndPort="true"/>">
 		<meta name="twitter:image" content="<s:url action="preview/twitter/%{id}" forceAddSchemeHostAndPort="true"/>">
 	</head>
 	
