@@ -19,7 +19,6 @@ package photohosting.dashboard;
 import com.opensymphony.xwork2.ActionSupport;
 import java.awt.Dimension;
 import java.io.File;
-import java.net.URL;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Map;

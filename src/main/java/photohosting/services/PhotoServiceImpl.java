@@ -46,6 +46,9 @@ public class PhotoServiceImpl implements PhotoService {
 	private ImageService imageService;
 	
 	@Setter
+	private SanitizeService sanitizeService;
+	
+	@Setter
 	private UserService userService;
 	
 	private static TableName getTableName() {
@@ -132,7 +135,7 @@ public class PhotoServiceImpl implements PhotoService {
 	public String create(User user, File file, String originalFilename) throws IOException {
 		// just strip off known image extensions
 		String useFilename = originalFilename.replaceAll("(?:\\.jpg)|(?:\\.png)", "");
-		String id = useFilename + "-" + UUID.randomUUID().toString();
+		String id = sanitizeService.sanitizeWithDashes(useFilename) + "-" + UUID.randomUUID().toString();
 		
 		
 		try (Connection connection = databaseAccessService.openConnection()) {
