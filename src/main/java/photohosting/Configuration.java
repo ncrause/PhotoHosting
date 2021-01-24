@@ -86,6 +86,9 @@ public class Configuration {
 	@Getter
 	private DeploymentEnvironment deploymentEnvironment;
 	
+	@Getter
+	private boolean supressCopyright;
+	
 	private void build() throws NamingException {
 		buildJndiEnvironmentContext();
 		

@@ -2,4 +2,6 @@
 <Context antiJARLocking="true" path="">
 	<ResourceLink name="mail/PhotoHosting" global="mail/PhotoHosting" type="javax.mail.Session"/>
 	<ResourceLink name="configuration/PhotoHosting/Environment" global="configuration/DeploymentEnvironment" type="java.lang.String"/>
+	<Environment name="configuration/PhotoHosting/SuppressCopyright"
+			type="java.lang.Boolean" value="true"/>
 </Context>
