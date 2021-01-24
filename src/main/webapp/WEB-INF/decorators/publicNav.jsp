@@ -4,7 +4,7 @@
     Author     : Nathan Crause <nathan@crause.name>
 --%>
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8" import="photohosting.Configuration"%>
 <%@taglib prefix="decorator" uri="http://www.opensymphony.com/sitemesh/decorator" %>
 <%@taglib prefix="page" uri="http://www.opensymphony.com/sitemesh/page" %>
 <%@taglib prefix="s" uri="/struts-tags" %>
@@ -44,6 +44,7 @@
 			</main>
 			
 			<footer class="container-fluid bg-light py-4 mt-4 border-top text-center">
+                <c:if test="${!Configuration.get().isSuppressCopyright()}">
 				<div itemprop="author" itemscope itemtype="https://schema.org/Person">
 					&copy; <%= java.time.Year.now().getValue() %> <a href="http://nathan.crause.name" target="_blank" itemprop="url"><span itemprop="givenName">Nathan</span> <span itemprop="familyname">Crause</span></a>
 					<meta itemprop="email" content="nathan@crause.name" />
@@ -53,6 +54,7 @@
 				<div>
 					<a href="https://github.com/ncrause/Photohosting" target="_blank">This software</a> is released under the <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" itemprop="license">GPLv3 license</a>.
 				</div>
+                </c:if>
 					
 				<div id="powered-by">
 					<h5>Powered By</h5>

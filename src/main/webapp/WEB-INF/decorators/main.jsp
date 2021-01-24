@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="photohosting.Configuration" %>
 <%@taglib prefix="decorator" uri="http://www.opensymphony.com/sitemesh/decorator" %>
 <%@taglib prefix="page" uri="http://www.opensymphony.com/sitemesh/page" %>
 <%@taglib prefix="s" uri="/struts-tags" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <html lang="en">
 	<head>
@@ -21,6 +22,8 @@
 		the head because we'd have no capacity to place jQuery-based scripts
 		in the bodies of pages --%>
 		<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        
+        <c:out value="${Configuration.get().getHeadHTML()}" escapeXml="false"/>
 		
 		<decorator:head/>
 	</head>

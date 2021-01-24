@@ -1,4 +1,6 @@
+<%@page import="photohosting.Configuration"%>
 <%@taglib prefix="s" uri="/struts-tags" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <html>
 	<head>
@@ -55,9 +57,9 @@
 				</div>
 
 				<div class="col-md-4">
-					<h3 class="py-4 border text-center">
-						Ad Space Here
-					</h3>
+					<div class="p-4 border text-center">
+                        <c:out value="${Configuration.get().getAdCode()}" escapeXml="false"/>
+					</div>
 				</div>
 			</div>
 		</div>

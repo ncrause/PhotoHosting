@@ -2,4 +2,17 @@
 <Context antiJARLocking="true" path="">
 	<ResourceLink name="mail/PhotoHosting" global="mail/PhotoHosting" type="javax.mail.Session"/>
 	<ResourceLink name="configuration/PhotoHosting/Environment" global="configuration/DeploymentEnvironment" type="java.lang.String"/>
+	<Environment name="configuration/PhotoHosting/SuppressCopyright"
+			type="java.lang.Boolean" value="true"/>
+    <!-- Used for injecting ad-serving HTML into the sidebar -->
+    <Environment name="configuration/PhotoHosting/AdCode" type="java.lang.String"
+            value="&lt;p&gt;Need free image hosting?&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;http://localhost:8080&quot; class=&quot;btn btn-block btn-primary&quot;&gt;Free Signup Here&lt;/a&gt;&lt;/p&gt;"/>
+    <!-- <Environment name="configuration/PhotoHosting/AdCode" type="java.lang.String">
+        <![CDATA[
+        <h1>This is my Ad Code</h1>
+        ]]>
+    </Environment> -->
+    <!-- Used for injecting code into the <head> section, such as Googel Analytics code and the like -->
+    <Environment name="configuration/PhotoHosting/HeadHTML" type="java.lang.String"
+            value="&lt;meta name=&quot;Bork&quot; content=&quot;Spork&quot;&gt;"/>
 </Context>

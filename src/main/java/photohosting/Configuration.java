@@ -22,6 +22,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
+import photohosting.utils.Values;
 
 /**
  *
@@ -30,6 +31,12 @@ import org.apache.commons.lang3.StringUtils;
 public class Configuration {
 	
 	public static final String DEPLOYMENT_ENVIRONMENT_LOOKUP_NAME = "configuration/PhotoHosting/Environment".intern();
+    
+    public static final String SUPPRESS_COPYRIGHT_LOOKUP_NAME = "configuration/PhotoHosting/SuppressCopyright".intern();
+    
+    public static final String AD_CODE_LOOKUP_NAME = "configuration/PhotoHosting/AdCode".intern();
+    
+    public static final String HEAD_HTML_LOOKUP_NAME = "configuration/PhotoHosting/HeadHTML".intern();
 	
 	private static Configuration instance;
 	
@@ -86,6 +93,15 @@ public class Configuration {
 	@Getter
 	private DeploymentEnvironment deploymentEnvironment;
 	
+	@Getter
+	private boolean suppressCopyright;
+    
+    @Getter
+    private String adCode;
+    
+    @Getter
+    private String headHTML;
+	
 	private void build() throws NamingException {
 		buildJndiEnvironmentContext();
 		
@@ -106,6 +122,10 @@ public class Configuration {
 								.collect(Collectors.joining(", "))));
 			}
 		}
+        
+        suppressCopyright = Values.coalesce(getJndiEnvironmentBoolean(SUPPRESS_COPYRIGHT_LOOKUP_NAME, false), Boolean.FALSE);
+        adCode = Values.coalesce(getJndiEnvironmentString(AD_CODE_LOOKUP_NAME, false), "<h5>Ad Space Here</h5>");
+        headHTML = getJndiEnvironmentString(HEAD_HTML_LOOKUP_NAME, false);
 	}
 	
 	private void buildTest() {
@@ -116,11 +136,11 @@ public class Configuration {
 		Context initialContext = new InitialContext();
 		jndiEnvironment = (Context) initialContext.lookup("java:comp/env");
 	}
-	
-	private String getJndiEnvironmentString(String name, 
+    
+    private Object getJndiEnvironmentObject(String name, 
 			boolean throwExceptionOrReturnNull) {
 		try {
-			return (String) jndiEnvironment.lookup(name);
+			return jndiEnvironment.lookup(name);
 		}
 		catch (NamingException ex) {
 			if (throwExceptionOrReturnNull) {
@@ -131,11 +151,21 @@ public class Configuration {
 				return null;
 			}
 		}
+    }
+	
+	private String getJndiEnvironmentString(String name, 
+			boolean throwExceptionOrReturnNull) {
+        return (String) getJndiEnvironmentObject(name, throwExceptionOrReturnNull);
 	}
 	
 	private String getJndiEnvironmentString(String name) {
 		return getJndiEnvironmentString(name, true);
 	}
+    
+    private Boolean getJndiEnvironmentBoolean(String name,
+            boolean throwExceptionOrReturnNull) {
+        return (Boolean) getJndiEnvironmentObject(name, throwExceptionOrReturnNull);
+    }
 	
 	/**
 	 * Used to determine if you are currently running in a testing
